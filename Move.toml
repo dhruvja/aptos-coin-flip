@@ -1,9 +1,10 @@
 [package]
-name = 'nft-tickets'
-version = '1.0.1'
+name = 'coin-flip'
+version = '1.0.0'
+upgrade_policy = "compatible"
 
 [addresses]
-CoinFlip = "b6f4e5b0df6b1e85dd9289ca746d3b7c3a66eff8b18d9d83d3862caf02ab7f21"
+CoinFlip = "a1922ba9d7f65934c939d1161525d1ec97252d25c5f7536d448b43a69b092185"
 
 [dependencies]
 AptosFramework = { git = "https://github.com/aptos-labs/aptos-core.git", subdir = "aptos-move/framework/aptos-framework/", rev="devnet"}
