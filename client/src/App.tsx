@@ -59,9 +59,6 @@ function App() {
 
   const fetchGames = async () => {
 
-    const all = await client.getAccountResources("0x238cd430923da47ce39ee11905880f162b8e46587e0a22dacf60634d924b7e80");
-    console.log(all);
-
     const resource = await client.getAccountResource(
       publishedAddress,
       `${publishedAddress}::Flip::GameStore`
