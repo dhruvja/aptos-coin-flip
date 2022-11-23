@@ -7,7 +7,7 @@ import { Types, AptosClient, BCS } from "aptos";
 import nacl from "tweetnacl";
 var Buffer = require("buffer/").Buffer;
 
-const client = new AptosClient("https://fullnode.devnet.aptoslabs.com/v1");
+const client = new AptosClient("https://fullnode.testnet.aptoslabs.com");
 
 /** Convert string to hex-encoded utf-8 bytes. */
 
