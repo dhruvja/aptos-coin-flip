@@ -45,6 +45,11 @@ function App() {
   React.useEffect(() => {
     connectToWallet();
     fetchGames();
+    const myInterval = setInterval(fetchGames, 2000);
+    return () => {
+      // should clear the interval when the component unmounts
+      clearInterval(myInterval);
+    };
   }, []);
 
   const connectToWallet = async () => {
