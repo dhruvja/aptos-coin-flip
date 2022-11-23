@@ -222,7 +222,7 @@ function App() {
                     <Card.Header>Game: {game.game_id}</Card.Header>
                     <Card.Meta>Bet Amount: {game.bet_amount}</Card.Meta>
                     <Card.Meta>
-                      Room Owner Choice: {game.owner_choice ? "Tails" : "Heads"}
+                      Room Owner Choice: {game.owner_choice ? "Heads" : "Tails"}
                     </Card.Meta>
                     {game.result.vec.length > 0 && <Card.Description>
                        Result: {game.result.vec[0] === "0" ? <strong>Tails</strong> : <strong>Heads</strong>}
