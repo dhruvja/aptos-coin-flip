@@ -1,7 +1,10 @@
-import React from "react";
+import React, {useState, useRef} from "react";
 import "./App.css";
 import { Header, Segment, Form, Button, Card, Image } from "semantic-ui-react";
 import Startbar from "./Startbar";
+import PopupGame from './components/PopupGame';
+import EyeIcon from './icons/Eyeicon';
+
 
 import { Types, AptosClient, BCS } from "aptos";
 import nacl from "tweetnacl";
@@ -25,7 +28,9 @@ function App() {
     joinee: { vec: [] };
     owner: string;
     owner_choice: boolean;
-    result: { vec: Array<string> };
+    result: {
+      vec: Array<string> 
+    };
     room_creation_time: string;
     winner: { vec: [] };
   };
@@ -42,6 +47,8 @@ function App() {
   const [games, setGames] = React.useState<GameStore>();
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [present, setPresent] = React.useState(false);
+ 
+
   React.useEffect(() => {
     connectToWallet();
     fetchGames();
@@ -141,7 +148,7 @@ function App() {
       let result = await window.aptos.signAndSubmitTransaction(transaction);
       console.log(result);
       await client.waitForTransaction(result.hash);
-      console.log(" it wont come here");
+      console.log(result.hash);
       fetchGames();
     } catch (e) {
       console.log(e);
@@ -175,8 +182,13 @@ function App() {
     } 
   }
 
+  const [styleBg, setStyleBg] = useState(false)
+  const blurBg = () => {
+    setStyleBg(!styleBg);
+  }
+
   return (
-    <div className="App">
+    <div className={styleBg? "App blur duration-1000" : "App"}>
       <Startbar />
       <Header as="h1">Aptos Coin Flip</Header>
       <div className="content leftAlign">
@@ -218,32 +230,42 @@ function App() {
               </Button>
             )}
           </Form>
-          <Header as="h3">Games</Header>
+          <Header as="h3">Games (rooms)</Header>
           <Card.Group>
             {games?.games?.map((game, index) => {
+              
               return (
-                <Card>
+                <Card key={index}>
                   <Card.Content>
                     <Card.Header>Game: {game.game_id}</Card.Header>
                     <Card.Meta>Bet Amount: {game.bet_amount}</Card.Meta>
                     <Card.Meta>
-                      Room Owner Choice: {game.owner_choice ? "Heads" : "Tails"}
+                      Owner Choice: {game.owner_choice ? "Heads (red)" : "Tails (black)"}
                     </Card.Meta>
                     {game.result.vec.length > 0 && <Card.Description>
-                       Result: {game.result.vec[0] === "0" ? <strong>Tails</strong> : <strong>Heads</strong>}
+                       Result: {game.result.vec[0] === "0" ? <strong>Tails (black)</strong> : <strong>Heads (red)</strong>}
                     </Card.Description>}
                   </Card.Content>
                   <Card.Content extra>
-                    <div className="ui two buttons">
-                      {game.winner.vec.length > 0 ? (
-                         <Button basic color="red" onClick={() => claimRewards(game.game_id)}>
+                    <div className="ui two buttons h-12">
+
+                      {game.winner.vec.length > 0 ? (<Button basic color="red" onClick={() => claimRewards(game.game_id)}>
                           Claim
-                        </Button>
-                      ) : (
-                        <Button basic color="green" onClick={() => playGame(game.game_id)}>
-                          Play
-                        </Button>
-                      )}
+                         </Button>) : (null) }
+                        
+                         
+                         <PopupGame
+                         claimClick={() => claimRewards(game.game_id)}
+                         playGame={() => playGame(game.game_id)}
+                         gameid={(game.game_id)} 
+                         betamount={(game.bet_amount)} 
+                         ownerchoice={(game.owner_choice ? "Heads (red)" : "Tails (black)")} 
+                         gameresultvec={(game.result.vec)}
+                         gameplayed={(game.winner.vec.length)}
+                         blurBg={() => blurBg()}
+                         />
+                        
+                      
                     </div>
                   </Card.Content>
                 </Card>
