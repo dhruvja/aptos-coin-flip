@@ -1,20 +1,15 @@
-
-
-import React, {useRef, useEffect, useState} from 'react';
-import Popup from 'reactjs-popup';
-import { Button } from 'semantic-ui-react';
-import EyeIcon from '../icons/Eyeicon';
-import createUpdater from 'react-component-updater';
-
-
+import React, { useRef, useEffect, useState } from "react";
+import Popup from "reactjs-popup";
+import { Button } from "semantic-ui-react";
+import EyeIcon from "../icons/Eyeicon";
+import createUpdater from "react-component-updater";
 
 function PopupGame(props) {
+  const ref = useRef();
 
-  const ref = useRef();  
-
-    const openTooltip = () => ref.current.open();  
-    const closeTooltip = () => ref.current.close();  
-    const toggleTooltip = () => ref.current.toggle();
+  const openTooltip = () => ref.current.open();
+  const closeTooltip = () => ref.current.close();
+  const toggleTooltip = () => ref.current.toggle();
 
   const [loading, setLoading] = useState(true);
   const [timer, setTimer] = useState(true);
@@ -22,27 +17,27 @@ function PopupGame(props) {
 
   const [useMyComponentUpdater, updateMyComponent] = createUpdater();
 
-
-
   useEffect(() => {
+    if (props.player == props.owner) {
+      console.log("Cannot play", props.gameid);
+    }
     if (timer) {
-    let id = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    setTimerId(id);
+      let id = setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      setTimerId(id);
     } else if (!timer && timerId) {
-    clearTimeout(timerId);
-    setLoading(true);
+      clearTimeout(timerId);
+      setLoading(true);
     }
     return () => {
-    if (timerId) {
-      clearTimeout(timerId);
-    }
-    }
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+    };
   }, [timer]);
 
-    
-  function stopTimer(){
+  function stopTimer() {
     updateMyComponent();
     props.blurBg(false);
 
@@ -53,7 +48,7 @@ function PopupGame(props) {
     updateMyComponent();
   }
 
-  function newTimer(){
+  function newTimer() {
     updateMyComponent();
     props.blurBg();
 
@@ -65,11 +60,11 @@ function PopupGame(props) {
   }
 
   useEffect(() => {
-    if (props.gameplayed !== props.gameplayed) {            
+    if (props.gameplayed !== props.gameplayed) {
     }
 
     return () => {
-      console.log(`prevProps`)
+      console.log(`prevProps`);
 
       setLoading(true);
       let id = setTimeout(() => {
@@ -77,58 +72,115 @@ function PopupGame(props) {
       }, 3000);
       setTimer(timerId);
       updateMyComponent();
+    };
+  }, [props.gameplayed]);
 
-    }
-       
-    },[props.gameplayed]);
-    
   return (
-  <>
-  <Popup
-    trigger={<Button onclick={()=>updateMyComponent(true)} color={props.gameplayed > 0 ? (null) : ("green")} className="!w-8 !flex !align-center !justify-center !items-center button"> {props.gameplayed > 0 ? (<EyeIcon/>) : ('Play')} </Button>}
-    modal
-    nested
-    ref={ref}
-    onOpen={newTimer}
-    onClose={stopTimer}
-    >
-    {close => 
-      (
-      <>
-      <div className="modal">
-      {loading ?
-        <div className="videopopup">
-          <h3>{props.gameplayed > 0 ? ("Launching ...") : (null)}</h3>
-      </div>  
-      :     
-      <div className="videopopup">
-        <>{props.gameplayed > 0 ? (<video autoPlay muted className='max-w-screen-md videocoin'>
-        <>{props.gameresultvec[0] === "0" ? (<source src='./WAVE_001OK.mp4' type='video/mp4'/>) : (<source src='./WAVE_000OK.mp4' type='video/mp4'/>)} </>
-        </video>) : (<></>)}</>
-      </div>
-      }
-        <div className="header !pt-6"> Game: {props.gameid} </div>
-        <div className="content">
-          <h3>Bet amount: {props.betamount}</h3>
-          <h3>Owner choice: {props.ownerchoice}</h3>
-        </div>
-        <div className='flex align-center justify-center items-center z-10 !h-full'>
-          <Button color="green" className={props.gameplayed > 0 ? ('invisible') : ('button !m-3 !mt-4')} onClick={props.playGame}>PLAY</Button>
-        </div>
-        <div className="actions">
-          <div className='flex'>
-          <Button className={props.gameplayed > 0 ? ('button !m-3') : ('button invisible !m-3')} onClick={props.claimClick}>CLAIM</Button>
-          <Button className="button !m-3" onClick={() => {close()}}>CLOSE</Button>
-          </div>
-        </div>     
-        </div>
-        </>
-      )}
+    <>
+      <Popup
+        trigger={
+          <Button
+            onclick={() => updateMyComponent(true)}
+            color={props.gameplayed > 0 ? null : "green"}
+            className="!w-8 !flex !align-center !justify-center !items-center button"
+          >
+            {" "}
+            {props.gameplayed > 0 ? <EyeIcon /> : "Play"}{" "}
+          </Button>
+        }
+        modal
+        nested
+        ref={ref}
+        onOpen={newTimer}
+        onClose={stopTimer}
+      >
+        {(close) => (
+          <>
+            <div className="modal">
+              {loading ? (
+                <div className="videopopup">
+                  <h3>{props.gameplayed > 0 ? "Launching ..." : null}</h3>
+                </div>
+              ) : (
+                <div className="videopopup">
+                  <>
+                    {props.gameplayed > 0 ? (
+                      <video
+                        autoPlay
+                        muted
+                        className="max-w-screen-md videocoin"
+                      >
+                        <>
+                          {props.gameresultvec[0] === "0" ? (
+                            <source src="./WAVE_001OK.mp4" type="video/mp4" />
+                          ) : (
+                            <source src="./WAVE_000OK.mp4" type="video/mp4" />
+                          )}{" "}
+                        </>
+                      </video>
+                    ) : (
+                      <></>
+                    )}
+                  </>
+                </div>
+              )}
+              <div className="header !pt-6"> Game: {props.gameid} </div>
+              <div className="content">
+                <h3>Bet amount: {props.betamount}</h3>
+                <h3>Owner choice: {props.ownerchoice}</h3>
+              </div>
+              <div className="flex align-center justify-center items-center z-10 !h-full">
+                {props.owner !== props.player ? (
+                  <Button
+                    color="green"
+                    className={
+                      props.gameplayed > 0 ? "invisible" : "button !m-3 !mt-4"
+                    }
+                    onClick={props.playGame}
+                  >
+                    PLAY
+                  </Button>
+                )
+                :
+                <Button
+                    color="green"
+                    className={
+                      props.gameplayed > 0 ? "invisible" : "button !m-3 !mt-4"
+                    }
+                    disabled
+                  >
+                    Cannot play 
+                  </Button>
+              }
+              </div>
+              <div className="actions">
+                <div className="flex">
+                  <Button
+                    className={
+                      props.gameplayed > 0
+                        ? "button !m-3"
+                        : "button invisible !m-3"
+                    }
+                    onClick={props.claimClick}
+                  >
+                    CLAIM
+                  </Button>
+                  <Button
+                    className="button !m-3"
+                    onClick={() => {
+                      close();
+                    }}
+                  >
+                    CLOSE
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </Popup>
+    </>
+  );
+}
 
-  </Popup>
-  </>
-  )
-
-};
-
-export default PopupGame
+export default PopupGame;

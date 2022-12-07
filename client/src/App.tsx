@@ -1,10 +1,9 @@
-import React, {useState, useRef} from "react";
+import React, { useState, useRef } from "react";
 import "./App.css";
 import { Header, Segment, Form, Button, Card, Image } from "semantic-ui-react";
 import Startbar from "./Startbar";
-import PopupGame from './components/PopupGame';
-import EyeIcon from './icons/Eyeicon';
-
+import PopupGame from "./components/PopupGame";
+import EyeIcon from "./icons/Eyeicon";
 
 import { Types, AptosClient, BCS } from "aptos";
 import nacl from "tweetnacl";
@@ -29,7 +28,7 @@ function App() {
     owner: string;
     owner_choice: boolean;
     result: {
-      vec: Array<string> 
+      vec: Array<string>;
     };
     room_creation_time: string;
     winner: { vec: [] };
@@ -47,11 +46,11 @@ function App() {
   const [games, setGames] = React.useState<GameStore>();
   const [isSaving, setIsSaving] = React.useState<boolean>(false);
   const [present, setPresent] = React.useState(false);
- 
 
   React.useEffect(() => {
     connectToWallet();
     fetchGames();
+    console.log(address);
     const myInterval = setInterval(fetchGames, 2000);
     return () => {
       // should clear the interval when the component unmounts
@@ -63,14 +62,16 @@ function App() {
     const status = await (window as any).aptos.isConnected();
     if (!status) {
       const result = await window.aptos.connect();
-      setAddress(result);
+      const account = await window.aptos.account();
+      setAddress(account.address);
     } else {
+      const account = await window.aptos.account();
+      setAddress(account.address);
       console.log("Wallet connected", urlAddress);
     }
   };
 
   const fetchGames = async () => {
-
     const resource = await client.getAccountResource(
       publishedAddress,
       `${publishedAddress}::Flip::GameStore`
@@ -79,7 +80,6 @@ function App() {
     if (data?.games !== undefined) {
       setGames(data);
       setPresent(true);
-      console.log(data.games[0]);
     }
   };
   const handleCreateRoomChange = (value: boolean) => {
@@ -179,16 +179,16 @@ function App() {
       console.log(e);
     } finally {
       setIsSaving(false);
-    } 
-  }
+    }
+  };
 
-  const [styleBg, setStyleBg] = useState(false)
+  const [styleBg, setStyleBg] = useState(false);
   const blurBg = () => {
     setStyleBg(!styleBg);
-  }
+  };
 
   return (
-    <div className={styleBg? "App blur duration-1000" : "App"}>
+    <div className={styleBg ? "App blur duration-1000" : "App"}>
       <Startbar />
       <Header as="h1">Aptos Coin Flip</Header>
       <div className="content leftAlign">
@@ -233,39 +233,51 @@ function App() {
           <Header as="h3">Games (rooms)</Header>
           <Card.Group>
             {games?.games?.map((game, index) => {
-              
               return (
                 <Card key={index}>
                   <Card.Content>
                     <Card.Header>Game: {game.game_id}</Card.Header>
                     <Card.Meta>Bet Amount: {game.bet_amount}</Card.Meta>
                     <Card.Meta>
-                      Owner Choice: {game.owner_choice ? "Heads (red)" : "Tails (black)"}
+                      Owner Choice:{" "}
+                      {game.owner_choice ? "Heads (red)" : "Tails (black)"}
                     </Card.Meta>
-                    {game.result.vec.length > 0 && <Card.Description>
-                       Result: {game.result.vec[0] === "0" ? <strong>Tails (black)</strong> : <strong>Heads (red)</strong>}
-                    </Card.Description>}
+                    {game.result.vec.length > 0 && (
+                      <Card.Description>
+                        Result:{" "}
+                        {game.result.vec[0] === "0" ? (
+                          <strong>Tails (black)</strong>
+                        ) : (
+                          <strong>Heads (red)</strong>
+                        )}
+                      </Card.Description>
+                    )}
                   </Card.Content>
                   <Card.Content extra>
                     <div className="ui two buttons h-12">
-
-                      {game.winner.vec.length > 0 ? (<Button basic color="red" onClick={() => claimRewards(game.game_id)}>
+                      {game.winner.vec.length > 0 ? (
+                        <Button
+                          basic
+                          color="red"
+                          onClick={() => claimRewards(game.game_id)}
+                        >
                           Claim
-                         </Button>) : (null) }
-                        
-                         
-                         <PopupGame
-                         claimClick={() => claimRewards(game.game_id)}
-                         playGame={() => playGame(game.game_id)}
-                         gameid={(game.game_id)} 
-                         betamount={(game.bet_amount)} 
-                         ownerchoice={(game.owner_choice ? "Heads (red)" : "Tails (black)")} 
-                         gameresultvec={(game.result.vec)}
-                         gameplayed={(game.winner.vec.length)}
-                         blurBg={() => blurBg()}
-                         />
-                        
-                      
+                        </Button>
+                      ) : null}
+                      <PopupGame
+                        claimClick={() => claimRewards(game.game_id)}
+                        playGame={() => playGame(game.game_id)}
+                        gameid={game.game_id}
+                        betamount={game.bet_amount}
+                        ownerchoice={
+                          game.owner_choice ? "Heads (red)" : "Tails (black)"
+                        }
+                        gameresultvec={game.result.vec}
+                        gameplayed={game.winner.vec.length}
+                        blurBg={() => blurBg()}
+                        player={address}
+                        owner={game.owner}
+                      />
                     </div>
                   </Card.Content>
                 </Card>
